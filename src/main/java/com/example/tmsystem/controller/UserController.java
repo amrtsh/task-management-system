@@ -1,34 +1,47 @@
 package com.example.tmsystem.controller;
 
+import com.example.tmsystem.dto.UserAuthDto;
 import com.example.tmsystem.dto.UserDto;
-import com.example.tmsystem.model.User;
 import com.example.tmsystem.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "/user")
 public class UserController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
-
     @Autowired
     private UserService userService;
 
-    @PostMapping
-    public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
-        UserDto createdUser = userService.addUser(userDto);
+    @GetMapping("/getAll")
+    public ResponseEntity<List<UserDto>> getAllUsers() {
+        List<UserDto> userDtoList = userService.getAllUsers();
+        return ResponseEntity.status(HttpStatus.OK).body(userDtoList);
+    }
+
+    @GetMapping("/getById/{userId}")
+    public ResponseEntity<UserDto> getById(@PathVariable Integer userId) {
+        UserDto userDto = userService.getUserById(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(userDto);
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<UserDto> createUser(@RequestBody UserAuthDto userAuthDto) {
+        UserDto createdUser = userService.createUser(userAuthDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
-//    @PostMapping
-//
-//
-//    @PutMapping
-//
-//    @DeleteMapping(path = "/id")
+    @PutMapping("/update")
+    public ResponseEntity<UserDto> updateUser(@RequestBody UserDto userDto) {
+        UserDto user = userService.updateUser(userDto);
+        return ResponseEntity.status(HttpStatus.OK).body(user);
+    }
+
+    @DeleteMapping("/delete/{userId}")
+    public void deleteUser(@PathVariable Integer userId) {
+        userService.deleteById(userId);
+    }
 }

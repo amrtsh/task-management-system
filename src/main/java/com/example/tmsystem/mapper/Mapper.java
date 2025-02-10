@@ -6,7 +6,7 @@ import com.example.tmsystem.model.User;
 
 public class Mapper {
 
-    public RoleDto toDtoRole(User.Role role) {
+    public static RoleDto toDtoRole(User.Role role) {
         return switch (role) {
             case QA -> RoleDto.QA;
             case DEVELOPER -> RoleDto.DEVELOPER;
@@ -31,7 +31,7 @@ public class Mapper {
         };
     }
 
-    public User.Role toDomainRole(RoleDto role) {
+    public static User.Role toDomainRole(RoleDto role) {
         return switch (role) {
             case QA -> User.Role.QA;
             case DEVELOPER -> User.Role.DEVELOPER;
@@ -65,7 +65,7 @@ public class Mapper {
     }
 
 
-    public UserDto toDto(User user) {
+    public static UserDto toDto(User user) {
         return new UserDto(
                 user.getId(),
                 user.getName(),
@@ -75,15 +75,23 @@ public class Mapper {
         );
     }
 
-    public User toDomain(UserAuthDto userAuthDto) {
-        return new User(
-                null,
-                userAuthDto.name(),
-                userAuthDto.surname(),
-                userAuthDto.email(),
-                userAuthDto.password(),
-                toDomainRole(userAuthDto.role())
-        );
+    public static User toDomain(UserAuthDto userAuthDto) {
+        return User.builder()
+                .name(userAuthDto.name())
+                .surname(userAuthDto.surname())
+                .email(userAuthDto.email())
+                .password(userAuthDto.password())
+                .role(toDomainRole(userAuthDto.role()))
+                .build();
+    }
+
+    public static User toDomain(UserDto userDto) {
+        return User.builder()
+                .name(userDto.name())
+                .surname(userDto.surname())
+                .email(userDto.email())
+                .role(toDomainRole(userDto.role()))
+                .build();
     }
 
     public static TaskDto toDto(Task task) {
@@ -94,7 +102,7 @@ public class Mapper {
                 toDtoStatus(task.getStatus()),
                 toDtoPriority(task.getPriority()),
                 task.getCreatedAt(),
-                task.getAssignedTo().getId(),
+                task.getAssignedTo() != null ? task.getAssignedTo().getId() : null,
                 task.getCreatedBy().getId()
         );
     }
@@ -105,7 +113,6 @@ public class Mapper {
                 .description(taskToCreateDto.description())
                 .status(toDomainStatus(taskToCreateDto.status()))
                 .priority(toDomainPriority(taskToCreateDto.priority()))
-                .createdAt(taskToCreateDto.createdAt())
                 .build();
 
     }

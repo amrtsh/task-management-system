@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.ApplicationScope;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.example.tmsystem.mapper.Mapper.toDomain;
@@ -28,13 +29,14 @@ public class TaskService {
         var user = userRepository.findById(taskToCreateDto.createdBy())
                 .orElseThrow(() -> new EntityNotFoundException("Task not found with id"));
         task.setCreatedBy(user);
+        task.setCreatedAt(LocalDateTime.now());
         return toDto(taskRepository.save(task));
     }
 
     public TaskDto updateTask(TaskDto taskDto) {
         Task task = toDomain(taskDto);
-        var assUser = userRepository.findById(taskDto.assignedTo())
-                .orElseThrow(() -> new EntityNotFoundException("some huinya"));
+        var assUser = taskDto.assignedTo() != null ? userRepository.findById(taskDto.assignedTo())
+                .orElseThrow(() -> new EntityNotFoundException("not found")) : null;
         var createdByUser = userRepository.findById(taskDto.createdBy())
                 .orElseThrow(() -> new EntityNotFoundException("one more huinya"));
         task.setAssignedTo(assUser);
@@ -47,8 +49,12 @@ public class TaskService {
         return toDto(task);
     }
 
-    public void deleteTaskById(Integer id) {
-        taskRepository.deleteById(id);
+    public List<TaskDto> getAllTasks() {
+        List<TaskDto> taskDtoList = taskRepository.findAll()
+                .stream()
+                .map(i -> toDto(i))
+                .toList();
+        return taskDtoList;
     }
 
     public List<TaskDto> findAllTasksByAssignedToId(Integer id) {
@@ -58,6 +64,10 @@ public class TaskService {
                 .map(i -> toDto(i))
                 .toList();
         return taskDtoList;
+    }
+
+    public void deleteTaskById(Integer id) {
+        taskRepository.deleteById(id);
     }
 
 }

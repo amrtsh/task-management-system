@@ -11,6 +11,8 @@ import java.util.List;
 @Entity
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User {
     @Id
     @NotNull
@@ -51,14 +53,5 @@ public class User {
 
     @OneToMany(mappedBy = "assignedTo")
     private List<Task> assignedTasks;
-
-    public User(Integer id, String name, String surname, String email, String password, Role role) {
-        this.id = id;
-        this.name = name;
-        this.surname = surname;
-        this.email = email;
-        this.password = password;
-        this.role = role;
-    }
 
 }

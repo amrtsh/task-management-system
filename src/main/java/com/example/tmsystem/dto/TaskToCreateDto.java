@@ -7,6 +7,5 @@ public record TaskToCreateDto(
         String description,
         StatusDto status,
         PriorityDto priority,
-        LocalDateTime createdAt,
         Integer createdBy
 ) {}
